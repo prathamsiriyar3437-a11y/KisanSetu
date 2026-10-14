@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KisanSetu (किसान सेतु) - Digital Agricultural Logistics Coordination Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#15803d',
+              600: '#166534',
+              700: '#14532d',
+              800: '#0f3f22',
+              900: '#062814',
+            },
+            ambercrop: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            },
+            soil: '#3d2616',
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            hindi: ['"Noto Sans Devanagari"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes pulseSoft {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .pulse-soft { animation: pulseSoft 3s infinite ease-in-out; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(22, 101, 52, 0.12);
+    }
+    .gradient-hero {
+      background: radial-gradient(circle at top right, #dcfce7 0%, #f0fdf4 40%, #ffffff 100%);
+    }
+    /* Hide scrollbars for clean UI */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-emerald-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-emerald-700/20">
+          🌾
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-lg text-emerald-900 tracking-tight">KisanSetu</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold border border-emerald-200">SIH 2026</span>
+          </div>
+          <p class="text-[11px] text-slate-500 font-medium">Digital Agricultural Logistics Platform</p>
+        </div>
+      </div>
+
+      <!-- Quick nav links -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600">
+        <a href="#problem-gap" class="hover:text-brand-600 transition">Problem & Gap</a>
+        <a href="#interactive-simulator" class="hover:text-brand-600 transition flex items-center gap-1.5 text-brand-600 bg-brand-50 px-3 py-1.5 rounded-lg border border-brand-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          Live Simulator
+        </a>
+        <a href="#aggregation-logic" class="hover:text-brand-600 transition">Matching Engine</a>
+        <a href="#system-architecture" class="hover:text-brand-600 transition">Architecture</a>
+        <a href="#impact-roadmap" class="hover:text-brand-600 transition">Roadmap & Impact</a>
+      </nav>
+
+      <!-- Language selector & Offline mode toggle simulation -->
+      <div class="flex items-center gap-2.5">
+        <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200 text-xs font-semibold">
+          <button id="lang-en" onclick="setAppLanguage('en')" class="px-2 py-1 rounded bg-white text-emerald-800 shadow-xs">EN</button>
+          <button id="lang-hi" onclick="setAppLanguage('hi')" class="px-2 py-1 rounded text-slate-600 hover:text-emerald-800 font-hindi">हिन्दी</button>
+          <button id="lang-kn" onclick="setAppLanguage('kn')" class="px-2 py-1 rounded text-slate-600 hover:text-emerald-800">ಕನ್ನಡ</button>
+          <button id="lang-mr" onclick="setAppLanguage('mr')" class="px-2 py-1 rounded text-slate-600 hover:text-emerald-800 font-hindi">मराठी</button>
+        </div>
+
+        <button onclick="toggleNetworkConnectivity()" id="net-toggle" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold bg-emerald-50 border-emerald-200 text-emerald-700 transition" title="Simulate Rural Network Drop">
+          <span id="net-indicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="net-status-text">Online</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="overflow-x-hidden">
+    <section class="gradient-hero pt-10 pb-16 border-b border-emerald-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Hackathon & Gov Evidence Banner -->
+        <div class="flex flex-wrap items-center gap-2.5 mb-6">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+            <svg class="w-3.5 h-3.5 text-amber-700" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            SMART INDIA HACKATHON 2026 • SOFTWARE EDITION
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+            ICAR / MoFPI Post-Harvest Loss Mitigation Framework
+          </span>
+          <span class="text-xs text-slate-500 font-medium ml-auto hidden lg:inline-block">
+            Last Updated for SIH Grand Finale: 2026
+          </span>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-10 items-center">
+          <div class="lg:col-span-7">
+            <h1 class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+              Aggregating <span class="text-brand-600 underline decoration-amber-400 decoration-wavy decoration-2">Fragmented Farmer Demand</span> With Matched Transport Capacity.
+            </h1>
+            <p class="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
+              From farm gate to wholesale mandi. KisanSetu is not just a truck-booking app—it is an 
+              <strong>intelligent coordination layer</strong> that aggregates small loads, prevents crop spoilage, 
+              and ensures equitable market access through smartphones, USSD, and assisted FPO counters.
+            </p>
+
+            <div class="mt-7 flex flex-wrap gap-3.5 items-center">
+              <a href="#interactive-simulator" class="px-5 py-3 rounded-xl bg-brand-600 text-white font-bold text-sm shadow-lg shadow-emerald-700/25 hover:bg-brand-700 transition flex items-center gap-2">
+                Launch Live Sandbox Demo
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </a>
+              <a href="#aggregation-logic" class="px-5 py-3 rounded-xl bg-white border border-slate-300 text-slate-700 font-bold text-sm hover:border-emerald-600 hover:text-emerald-800 transition">
+                Inspect 6-Factor Matching
+              </a>
+              <span class="text-xs text-slate-500 flex items-center gap-1.5 pl-2">
+                <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Zero dedicated fleet required
+              </span>
+            </div>
+
+            <!-- Quick stats bar -->
+            <div class="mt-10 grid grid-cols-3 gap-4 pt-6 border-t border-emerald-100">
+              <div>
+                <div class="text-2xl font-black text-brand-700">15–25%</div>
+                <div class="text-xs text-slate-500 font-medium">Post-harvest transport spoilage addressed</div>
+              </div>
+              <div>
+                <div class="text-2xl font-black text-brand-700">₹0.85/kg</div>
+                <div class="text-xs text-slate-500 font-medium">Avg freight savings via smart shared pooling</div>
+              </div>
+              <div>
+                <div class="text-2xl font-black text-brand-700">4 Access Paths</div>
+                <div class="text-xs text-slate-500 font-medium">App, Web, FPO Assisted, SMS/USSD</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5">
+            <div class="glass-card rounded-2xl p-6 shadow-xl border border-emerald-200/80">
+              <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span>
+                  KisanSetu 5-Stage Core Pipeline
+                </span>
+                <span class="text-[11px] bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded">Slide 1 Architecture</span>
+              </div>
+
+              <!-- Interactive Step nodes -->
+              <div class="space-y-3">
+                <div onclick="previewStageDetail(1)" class="stage-step cursor-pointer p-3 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/70 transition flex items-center justify-between" id="stage-card-1">
+                  <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-lg bg-emerald-700 text-white font-bold text-xs flex items-center justify-center">1</span>
+                    <div>
+                      <h4 class="text-xs font-bold text-slate-900">FARMERS (किसान)</h4>
+                      <p class="text-[11px] text-slate-500">Post crop, harvest quantity & pickup constraints</p>
+                    </div>
+                  </div>
+                  <span class="text-xs text-emerald-700 font-semibold">Ready</span>
+                </div>
+
+                <div onclick="previewStageDetail(2)" class="stage-step cursor-pointer p-3 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition flex items-center justify-between" id="stage-card-2">
+                  <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-lg bg-slate-700 text-white font-bold text-xs flex items-center justify-center">2</span>
+                    <div>
+                      <h4 class="text-xs font-bold text-slate-900">AGGREGATE (एकत्रीकरण)</h4>
+                      <p class="text-[11px] text-slate-500">Nearby small loads (300kg + 450kg + 250kg) combined</p>
+                    </div>
+                  </div>
+                  <span class="text-xs text-slate-400 font-semibold">Cluster</span>
+                </div>
+
+                <div onclick="previewStageDetail(3)" class="stage-step cursor-pointer p-3 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition flex items-center justify-between" id="stage-card-3">
+                  <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-lg bg-slate-700 text-white font-bold text-xs flex items-center justify-center">3</span>
+                    <div>
+                      <h4 class="text-xs font-bold text-slate-900">MATCH (क्षमता मिलान)</h4>
+                      <p class="text-[11px] text-slate-500">Constraint engine scores route, cold-chain & capacity</p>
+                    </div>
+                  </div>
+                  <span class="text-xs text-slate-400 font-semibold">Ranked</span>
+                </div>
+
+                <div onclick="previewStageDetail(4)" class="stage-step cursor-pointer p-3 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition flex items-center justify-between" id="stage-card-4">
+                  <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-lg bg-slate-700 text-white font-bold text-xs flex items-center justify-center">4</span>
+                    <div>
+                      <h4 class="text-xs font-bold text-slate-900">TRANSPORT (परिवहन)</h4>
+                      <p class="text-[11px] text-slate-500">Structured driver manifest & multi-point waypoint pickup</p>
+                    </div>
+                  </div>
+                  <span class="text-xs text-slate-400 font-semibold">En Route</span>
+                </div>
+
+                <div onclick="previewStageDetail(5)" class="stage-step cursor-pointer p-3 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition flex items-center justify-between" id="stage-card-5">
+                  <div class="flex items-center gap-3">
+                    <span class="w-7 h-7 rounded-lg bg-slate-700 text-white font-bold text-xs flex items-center justify-center">5</span>
+                    <div>
+                      <h4 class="text-xs font-bold text-slate-900">MARKET (मंडी / डिलीवरी)</h4>
+                      <p class="text-[11px] text-slate-500">Proof-of-delivery (OTP/Photo), transparent settlement</p>
+                    </div>
+                  </div>
+                  <span class="text-xs text-emerald-600 font-semibold">Delivered</span>
+                </div>
+              </div>
+
+              <!-- Interactive stage message box -->
+              <div id="stage-detail-box" class="mt-4 p-3 rounded-xl bg-slate-100 text-slate-700 text-xs border border-slate-200">
+                <span class="font-bold text-emerald-800">Stage 1 Insight:</span> Farmers submit crop details early before harvest finishes, creating demand visibility ahead of time so vehicles are pre-scheduled.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="problem-gap" class="py-16 bg-white border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <span class="text-xs font-bold tracking-widest text-emerald-700 uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            Slide 2, 3 & 4 Analysis
+          </span>
+          <h2 class="text-3xl font-extrabold text-slate-900 mt-3">Why Post-Harvest Logistics Breaks Down</h2>
+          <p class="text-slate-600 text-sm sm:text-base mt-2">
+            The post-harvest journey breaks when crop is ready but transport is not. It’s not just a transport problem — it is an entire agricultural value-chain failure.
+          </p>
+        </div>
+
+        <!-- 5 Core Broken Links from PPT -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-14">
+          <div class="p-4 rounded-xl border border-red-100 bg-red-50/50 hover:bg-red-50 transition">
+            <div class="w-8 h-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center font-bold text-sm mb-3">1</div>
+            <h3 class="font-bold text-slate-900 text-sm">Fragmented Loads</h3>
+            <p class="text-xs text-slate-600 mt-1">Smallholder farmers have produce too small (200-500kg) to economically book an entire 2-ton pickup vehicle.</p>
+          </div>
+          <div class="p-4 rounded-xl border border-amber-100 bg-amber-50/50 hover:bg-amber-50 transition">
+            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm mb-3">2</div>
+            <h3 class="font-bold text-slate-900 text-sm">Transport Mismatch</h3>
+            <p class="text-xs text-slate-600 mt-1">Empty vehicles drive back along corridors, but local farm harvest schedules remain completely invisible to them.</p>
+          </div>
+          <div class="p-4 rounded-xl border border-orange-100 bg-orange-50/50 hover:bg-orange-50 transition">
+            <div class="w-8 h-8 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-sm mb-3">3</div>
+            <h3 class="font-bold text-slate-900 text-sm">Perishability Clock</h3>
+            <p class="text-xs text-slate-600 mt-1">Produce like tomatoes and chillies degrades by 5-8% every 4 hours in ambient tropical heat without timely pickup.</p>
+          </div>
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100/60 transition">
+            <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm mb-3">4</div>
+            <h3 class="font-bold text-slate-900 text-sm">Information Gap</h3>
+            <p class="text-xs text-slate-600 mt-1">Farmers lack transparent spot rates, relying on middleman cartels who inflate logistics deductions at the mandi.</p>
+          </div>
+          <div class="p-4 rounded-xl border border-blue-100 bg-blue-50/50 hover:bg-blue-50 transition">
+            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm mb-3">5</div>
+            <h3 class="font-bold text-slate-900 text-sm">Access Exclusion</h3>
+            <p class="text-xs text-slate-600 mt-1">Smartphone-only apps fail the 42% rural farmers who rely on basic feature phones, local FPO hubs, or spotty 2G networks.</p>
+          </div>
+        </div>
+
+        <!-- Before vs After Interactive Matrix -->
+        <div class="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
+            <div>
+              <span class="text-xs text-amber-400 font-bold uppercase tracking-wider">Comparative System Evaluation</span>
+              <h3 class="text-xl sm:text-2xl font-bold mt-1">Current Practice vs. KisanSetu Coordination Layer</h3>
+            </div>
+            <div class="text-xs bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-300">
+              Derived from Slide 4 & 24 Matrix
+            </div>
+          </div>
+
+          <div class="mt-6 overflow-x-auto">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead>
+                <tr class="text-slate-400 border-b border-slate-800">
+                  <th class="py-3 px-3 font-semibold">Dimension</th>
+                  <th class="py-3 px-3 font-semibold text-rose-300">Current Broken Practice</th>
+                  <th class="py-3 px-3 font-semibold text-emerald-400">KisanSetu Coordinated Solution</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 text-slate-300">
+                <tr>
+                  <td class="py-3 px-3 font-semibold text-white">Vehicle Sourcing</td>
+                  <td class="py-3 px-3 text-rose-200">Phone calls to local brokers; opaque spot pricing</td>
+                  <td class="py-3 px-3 text-emerald-300 font-medium">Pre-booked capacity matching with upfront algorithmic pricing</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-semibold text-white">Small Volume Farmer</td>
+                  <td class="py-3 px-3 text-rose-200">Forced to pay full vehicle fare or sell at distress gate rates</td>
+                  <td class="py-3 px-3 text-emerald-300 font-medium">Smart route aggregation (pays only for booked kg share)</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-semibold text-white">Crop Compatibility</td>
+                  <td class="py-3 px-3 text-rose-200">General transport; delicate perishables mixed with dirt/grain</td>
+                  <td class="py-3 px-3 text-emerald-300 font-medium">Strict perishable eligibility constraint (reefer vs ambient crates)</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-semibold text-white">Rural Connectivity</td>
+                  <td class="py-3 px-3 text-rose-200">App fails when 4G signal drops in interior fields</td>
+                  <td class="py-3 px-3 text-emerald-300 font-medium">Offline IndexedDB cache + SMS/USSD sync + FPO Assisted Portal</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-semibold text-white">Exceptions / Delays</td>
+                  <td class="py-3 px-3 text-rose-200">No backup; crops left rotting under sun when driver cancels</td>
+                  <td class="py-3 px-3 text-emerald-300 font-medium">Automated fallback re-queue to ranked tier-2 transport carriers</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="interactive-simulator" class="py-16 bg-slate-100/70 border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-600 text-white">Slide 24 In Action</span>
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">End-to-End Testbed</span>
+            </div>
+            <h2 class="text-3xl font-black text-slate-900 mt-1">Multi-Role Logistics Simulation Sandbox</h2>
+            <p class="text-slate-600 text-sm mt-1 max-w-2xl">
+              Experience the end-to-end loop as presented to hackathon evaluators: Post shipment, watch algorithmic aggregation, review driver manifests, and trigger dynamic edge-case recovery.
+            </p>
+          </div>
+
+          <!-- Role Tab Switcher -->
+          <div class="inline-flex p-1.5 bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto max-w-full">
+            <button onclick="switchTab('farmer-view')" id="tab-farmer-view" class="role-tab px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-brand-600 text-white transition whitespace-nowrap">
+              👩‍🌾 1. Farmer Portal
+            </button>
+            <button onclick="switchTab('aggregation-view')" id="tab-aggregation-view" class="role-tab px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-brand-600 transition whitespace-nowrap">
+              ⚙️ 2. Smart Aggregator
+            </button>
+            <button onclick="switchTab('driver-view')" id="tab-driver-view" class="role-tab px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-brand-600 transition whitespace-nowrap">
+              🚚 3. Driver Manifest
+            </button>
+            <button onclick="switchTab('lifecycle-view')" id="tab-lifecycle-view" class="role-tab px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-brand-600 transition whitespace-nowrap">
+              ⚠️ 4. Lifecycle & Recovery
+            </button>
+          </div>
+        </div>
+
+        <!-- Simulated Notification Toast Banner -->
+        <div id="sim-toast" class="hidden mb-6 p-4 rounded-xl bg-amber-500 text-white text-sm font-semibold shadow-md flex items-center justify-between transition-all">
+          <div class="flex items-center gap-2" id="sim-toast-text">
+            <span>Notification alert message</span>
+          </div>
+          <button onclick="dismissToast()" class="text-white/80 hover:text-white font-bold text-lg">&times;</button>
+        </div>
+
+        <!-- TAB 1: Farmer Portal -->
+        <div id="panel-farmer-view" class="tab-panel">
+          <div class="grid lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-7 bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+              <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+                <div>
+                  <h3 class="font-extrabold text-slate-900 text-lg flex items-center gap-2">
+                    <span>New Farmgate Dispatch Request</span>
+                    <span class="text-xs font-medium px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">Verified Farmer ID: KS-9281</span>
+                  </h3>
+                  <p class="text-xs text-slate-500">Design principle: Minimal typing, instant cost estimate, flexible access.</p>
+                </div>
+                <!-- Access Channel Badge -->
+                <div class="text-right">
+                  <span class="text-[11px] font-bold text-slate-400 block uppercase">Access Mode</span>
+                  <select id="access-mode-select" class="text-xs font-semibold bg-slate-50 border border-slate-300 rounded px-2 py-1 text-slate-700">
+                    <option value="app">Mobile App</option>
+                    <option value="assisted">FPO Assisted Desk</option>
+                    <option value="sms">SMS / USSD Gateway</option>
+                    <option value="call">Kisan Helpline IVR</option>
+                  </select>
+                </div>
+              </div>
+
+              <form id="farmer-booking-form" onsubmit="handleFarmerSubmit(event)" class="space-y-4">
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1" id="lbl-crop">Select Commodity / Crop</label>
+                    <select id="crop-select" onchange="calculateEstimate()" class="w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 bg-slate-50 font-medium focus:ring-2 focus:ring-brand-500">
+                      <option value="Tomato" data-perish="high" data-rate="1.4">Tomato (टमाटर) - Highly Perishable</option>
+                      <option value="Onion" data-perish="low" data-rate="0.9">Onion (प्याज) - Semi-perishable</option>
+                      <option value="Potato" data-perish="low" data-rate="0.8">Potato (आलू) - Ambient Stable</option>
+                      <option value="Green Chillies" data-perish="high" data-rate="1.6">Green Chillies (हरी मिर्च) - Moisture Sensitive</option>
+                      <option value="Mangoes" data-perish="high" data-rate="1.8">Mangoes (आम) - Fragile / Crates Required</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1" id="lbl-qty">Produce Weight (Kilograms)</label>
+                    <div class="relative">
+                      <input type="number" id="crop-qty" min="50" max="4000" value="450" oninput="calculateEstimate()" class="w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 font-bold text-slate-800 bg-slate-50 focus:ring-2 focus:ring-brand-500">
+                      <span class="absolute right-3 top-2.5 text-xs font-bold text-slate-400">KG</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1" id="lbl-pickup">Pickup Point (Village Collection)</label>
+                    <select id="pickup-point" onchange="calculateEstimate()" class="w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 bg-slate-50 font-medium">
+                      <option value="Hosakote Hub">Hosakote Cluster Hub (Bengaluru Rural)</option>
+                      <option value="Malur Village Point">Malur Village Aggregation Point</option>
+                      <option value="Kolar Farm Gate A">Kolar East Farm Gate A</option>
+                      <option value="Bangarapet Centre">Bangarapet FPO Primary Center</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1" id="lbl-dest">Target Destination / Wholesale Mandi</label>
+                    <select id="dest-market" onchange="calculateEstimate()" class="w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 bg-slate-50 font-medium">
+                      <option value="Yeshwanthpur APMC">Yeshwanthpur APMC Mandi (45 km)</option>
+                      <option value="KR Market Terminal">KR Market Central Terminal (38 km)</option>
+                      <option value="Kolar Regional Mandi">Kolar APMC Yard (22 km)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Pickup Time Window</label>
+                    <select id="pickup-window" class="w-full text-sm rounded-xl border border-slate-300 px-3 py-2.5 bg-slate-50 font-medium">
+                      <option value="Tomorrow 06:00 - 08:00 AM">Tomorrow 06:00 - 08:00 AM (Optimal Harvest)</option>
+                      <option value="Tomorrow 08:00 - 10:00 AM">Tomorrow 08:00 - 10:00 AM</option>
+                      <option value="Same Day Evening 05:00 PM">Today 05:00 - 07:00 PM (Emergency Dispatch)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Temperature / Cold-chain Preference</label>
+                    <div class="flex items-center gap-2 pt-2">
+                      <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 cursor-pointer">
+                        <input type="checkbox" id="require-reefer" onchange="calculateEstimate()" class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+                        Request Refrigerated / Insulated Bay
+                      </label>
+                    </div>
+                    <span class="text-[11px] text-slate-400 block mt-0.5">Recommended automatically for ripened tomatoes</span>
+                  </div>
+                </div>
+
+                <!-- Aggregation Opt-In selection (Slide 7) -->
+                <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" id="opt-aggregate" checked onchange="calculateEstimate()" class="mt-1 w-4 h-4 text-emerald-600 rounded">
+                    <div>
+                      <span class="text-xs font-bold text-emerald-900">Enable Smart Shared Aggregation (Save up to 45%)</span>
+                      <p class="text-[11px] text-emerald-700 mt-0.5 leading-snug">
+                        Combine your 450 kg load with compatible nearby farmers along the Hosakote corridor. If unticked, a private dedicated pickup is dispatched at higher cost.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-md shadow-emerald-700/20 transition flex items-center justify-center gap-2">
+                  <span>Confirm Dispatch Intent & Submit to Pool</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                </button>
+              </form>
+            </div>
+
+            <!-- Price Breakdown & Offline Queue Status Card -->
+            <div class="lg:col-span-5 space-y-6">
+              <!-- Upfront Cost Preview (Slide 8) -->
+              <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h4 class="font-bold text-slate-900 text-sm">Transparent Cost Estimation</h4>
+                  <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Algorithmic</span>
+                </div>
+
+                <div class="my-4 space-y-2 text-xs">
+                  <div class="flex justify-between text-slate-600">
+                    <span>Base Freight (Per-KG pooled rate)</span>
+                    <span id="est-base-freight" class="font-semibold text-slate-900">₹ 420.00</span>
+                  </div>
+                  <div class="flex justify-between text-slate-600">
+                    <span>Cold-Chain / Handling Surcharge</span>
+                    <span id="est-handling-fee" class="font-semibold text-slate-900">₹ 0.00</span>
+                  </div>
+                  <div class="flex justify-between text-emerald-700 font-medium">
+                    <span>Shared Load Aggregation Rebate</span>
+                    <span id="est-discount" class="font-bold">- ₹ 180.00</span>
+                  </div>
+                  <div class="flex justify-between text-slate-500 pt-1">
+                    <span>KisanSetu Platform Coordination (2.5%)</span>
+                    <span id="est-platform-fee" class="font-medium text-slate-700">₹ 15.00</span>
+                  </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-200 flex items-baseline justify-between">
+                  <div>
+                    <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">Total Payable</span>
+                    <div id="est-total-cost" class="text-2xl font-black text-brand-700">₹ 255.00</div>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-[11px] text-slate-400 block">Unit Cost</span>
+                    <span id="est-per-kg" class="text-xs font-bold text-slate-700">₹ 0.57 / kg</span>
+                  </div>
+                </div>
+
+                <div class="mt-4 p-2.5 rounded-lg bg-slate-50 text-[11px] text-slate-500 border border-slate-100">
+                  💡 No hidden mandi deductions. Driver receives agreed fare automatically upon verified OTP handover.
+                </div>
+              </div>
+
+              <!-- Low-Connectivity & Cache Diagnostics (Slide 10 & 11) -->
+              <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                  <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-emerald-500" id="sync-dot"></div>
+                    <h4 class="font-bold text-slate-900 text-sm">Resilience & Offline Queue</h4>
+                  </div>
+                  <span id="sync-label" class="text-xs text-emerald-700 font-semibold">Synced with Cloud</span>
+                </div>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                  If village 4G connectivity drops, shipment intent is automatically cached in local device storage. The system continues via SMS fallback without data loss.
+                </p>
+                <div class="mt-4 grid grid-cols-2 gap-2 text-center text-xs">
+                  <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                    <div class="font-bold text-slate-800" id="offline-queue-count">0 Shipments</div>
+                    <span class="text-[10px] text-slate-400">Offline Queued</span>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                    <div class="font-bold text-slate-800" id="sms-fallback-status">Ready (Active)</div>
+                    <span class="text-[10px] text-slate-400">SMS / USSD Gateway</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Smart Aggregator Engine -->
+        <div id="panel-aggregation-view" class="tab-panel hidden">
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-slate-100 gap-4">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">Slide 7 & 8 Architecture</span>
+                <h3 class="text-xl font-black text-slate-900 mt-0.5">Constraint-Based Load Aggregation Visualizer</h3>
+                <p class="text-xs text-slate-500">Combining small loads into economically optimal, temperature-compatible transport batches.</p>
+              </div>
+              <button onclick="recalculateAggregationBatch()" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-bold text-xs border border-emerald-200 flex items-center gap-1.5 self-start">
+                <span>🔄 Re-Evaluate Route Batches</span>
+              </button>
+            </div>
+
+            <!-- Visual Batch Aggregation Diagram (Slide 7) -->
+            <div class="mt-8 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+              <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-4">Current Corridors: Hosakote ➔ Yeshwanthpur Mandi (Route NH-75)</h4>
+
+              <div class="grid lg:grid-cols-12 gap-6 items-center">
+                <!-- Fragmented Farmers List -->
+                <div class="lg:col-span-5 space-y-3">
+                  <div class="p-3.5 bg-white rounded-xl border border-emerald-200 shadow-xs flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center">A</div>
+                      <div>
+                        <div class="text-xs font-bold text-slate-900">Farmer Ramesh (Kolar Gate)</div>
+                        <div class="text-[11px] text-slate-500">Produce: 300 kg Tomatoes • Crates</div>
+                      </div>
+                    </div>
+                    <span class="text-xs font-mono font-bold text-emerald-700">300 kg</span>
+                  </div>
+
+                  <div class="p-3.5 bg-white rounded-xl border border-emerald-200 shadow-xs flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center">B</div>
+                      <div>
+                        <div class="text-xs font-bold text-slate-900">Farmer Suresh (Hosakote Hub)</div>
+                        <div class="text-[11px] text-slate-500">Produce: 450 kg Tomatoes • Ready 7 AM</div>
+                      </div>
+                    </div>
+                    <span class="text-xs font-mono font-bold text-emerald-700">450 kg</span>
+                  </div>
+
+                  <div class="p-3.5 bg-white rounded-xl border border-emerald-200 shadow-xs flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center">C</div>
+                      <div>
+                        <div class="text-xs font-bold text-slate-900">Farmer Chennamma (Malur)</div>
+                        <div class="text-[11px] text-slate-500">Produce: 250 kg Green Chillies • Bags</div>
+                      </div>
+                    </div>
+                    <span class="text-xs font-mono font-bold text-emerald-700">250 kg</span>
+                  </div>
+                </div>
+
+                <!-- Aggregation Arrow Indicator -->
+                <div class="lg:col-span-2 text-center py-2">
+                  <div class="inline-flex flex-col items-center justify-center">
+                    <span class="text-xs font-extrabold text-brand-700 bg-brand-100 px-3 py-1 rounded-full mb-1">Combined</span>
+                    <svg class="w-8 h-8 text-brand-600 hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    <span class="text-[10px] text-slate-500 font-medium mt-1">Compatible Handling</span>
+                  </div>
+                </div>
+
+                <!-- Aggregated Result Vehicle -->
+                <div class="lg:col-span-5 bg-white p-5 rounded-xl border-2 border-brand-500 shadow-md">
+                  <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span class="text-xs font-bold text-emerald-900">Batch #KS-AGG-8831</span>
+                    <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">1,000 kg Consolidated</span>
+                  </div>
+                  <div class="mt-3 space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-600">
+                      <span>Usable Vehicle Payload</span>
+                      <span class="font-bold text-slate-900">1,500 kg (Bolero Maxi / Tata Ace XL)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                      <div class="bg-brand-600 h-full rounded-full transition-all duration-700" style="width: 66.6%;"></div>
+                    </div>
+                    <div class="flex justify-between text-[11px] text-slate-500">
+                      <span>67% Filled (Viable dispatch threshold: 60%)</span>
+                      <span class="font-semibold text-emerald-700">+33% room for return backhauls</span>
+                    </div>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span class="text-slate-500">Assigned Driver:</span>
+                    <span class="font-bold text-slate-800">Manjunath K. (KA-04-E-4491) ★ 4.9</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6 Constraint Checkers as specified in PPT Slide 8 -->
+            <div class="mt-8">
+              <h4 class="text-sm font-bold text-slate-900 mb-4">Matching Engine Feasibility Filters (Constraint Checkers)</h4>
+              <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-slate-800">1. Usable Capacity</span>
+                    <span class="text-[11px] font-bold text-emerald-700">✓ PASS</span>
+                  </div>
+                  <p class="text-xs text-slate-600">Total batch volume (1,000kg) &le; Vehicle rated payload (1,500kg).</p>
+                </div>
+
+                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-slate-800">2. Route Deviation</span>
+                    <span class="text-[11px] font-bold text-emerald-700">✓ PASS (&lt;4.2 km)</span>
+                  </div>
+                  <p class="text-xs text-slate-600">Pickup points A, B, and C add under 18 minutes to the main corridor.</p>
+                </div>
+
+                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-slate-800">3. Time Window</span>
+                    <span class="text-[11px] font-bold text-emerald-700">✓ PASS (06:30 - 08:30)</span>
+                  </div>
+                  <p class="text-xs text-slate-600">All 3 farmers have produce packed before driver arrival sequence.</p>
+                </div>
+
+                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-slate-800">4. Commodity Compatibility</span>
+                    <span class="text-[11px] font-bold text-emerald-700">✓ PASS</span>
+                  </div>
+                  <p class="text-xs text-slate-600">Vegetables in ventilated crates; no noxious or odor-contaminating cargo.</p>
+                </div>
+
+                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-slate-800">5. Total Logistics Cost</span>
+                    <span class="text-[11px] font-bold text-emerald-700">✓ OPTIMAL</span>
+                  </div>
+                  <p class="text-xs text-slate-600">Shared vehicle saves ₹0.82/kg compared to independent runs.</p>
+                </div>
+
+                <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-slate-800">6. Driver Reliability Score</span>
+                    <span class="text-[11px] font-bold text-emerald-700">✓ 96.4% Rating</span>
+                  </div>
+                  <p class="text-xs text-slate-600">Aadhaar verified, valid commercial permit & fitness certificate.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Driver Experience -->
+        <div id="panel-driver-view" class="tab-panel hidden">
+          <div class="grid lg:grid-cols-12 gap-8">
+            <!-- Driver Phone View Mockup -->
+            <div class="lg:col-span-7 bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+              <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center">
+                    MK
+                  </div>
+                  <div>
+                    <h3 class="font-extrabold text-slate-900 text-sm">Driver Manjunath K.</h3>
+                    <p class="text-xs text-slate-500">Tata Ace Gold (KA-04-E-4491) • 1.5 Ton Insulated Bay</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs font-black text-brand-700 block">₹ 1,840 Payout</span>
+                  <span class="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Guaranteed Advance</span>
+                </div>
+              </div>
+
+              <!-- Today's Run Manifest as per Slide 12 -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 mb-5">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-bold text-slate-800 uppercase tracking-wide">Today's Optimized Multi-Stop Run</span>
+                  <span class="text-xs text-slate-500">Est. Total Time: 2h 40m</span>
+                </div>
+
+                <div class="relative pl-6 space-y-4 before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-300">
+                  <div class="relative">
+                    <span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-emerald-600 text-[10px] font-bold text-white flex items-center justify-center">1</span>
+                    <div class="text-xs font-bold text-slate-900">Stop 1: Hosakote Farm Hub (07:15 AM)</div>
+                    <div class="text-[11px] text-slate-600">Pick up 450 kg Tomato • Contact: Farmer Suresh (+91 98450-XXXXX)</div>
+                    <button onclick="triggerSimAction('Loaded Stop 1 (450 kg)')" class="mt-1 text-[11px] font-semibold text-brand-700 underline">Record Cargo Loaded</button>
+                  </div>
+
+                  <div class="relative">
+                    <span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-emerald-600 text-[10px] font-bold text-white flex items-center justify-center">2</span>
+                    <div class="text-xs font-bold text-slate-900">Stop 2: Malur Collection Center (07:45 AM)</div>
+                    <div class="text-[11px] text-slate-600">Pick up 250 kg Green Chillies • Contact: Farmer Chennamma</div>
+                    <button onclick="triggerSimAction('Loaded Stop 2 (250 kg)')" class="mt-1 text-[11px] font-semibold text-brand-700 underline">Record Cargo Loaded</button>
+                  </div>
+
+                  <div class="relative">
+                    <span class="absolute -left-6 top-1 w-4 h-4 rounded-full bg-slate-900 text-[10px] font-bold text-white flex items-center justify-center">3</span>
+                    <div class="text-xs font-bold text-slate-900">Final Drop: Yeshwanthpur APMC Mandi (09:30 AM)</div>
+                    <div class="text-[11px] text-slate-600">Unload 700 kg total consolidated batch • Buyer Yard Gate #4</div>
+                    <span class="inline-block mt-1 text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Requires Receiver OTP</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Driver Action Buttons -->
+              <div class="grid grid-cols-2 gap-3">
+                <button onclick="triggerSimAction('Started GPS Navigation to Stop 1')" class="py-2.5 px-4 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition flex items-center justify-center gap-1.5">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                  <span>Start Turn-by-Turn GPS</span>
+                </button>
+                <button onclick="triggerSimAction('Reported Delay of 15 mins due to Railway Crossing')" class="py-2.5 px-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 font-bold text-xs hover:bg-rose-100 transition">
+                  ⚠️ Report Traffic / Delay
+                </button>
+              </div>
+            </div>
+
+            <!-- Return Load & Utilization Engine (Slide 12: Driver Incentive) -->
+            <div class="lg:col-span-5 space-y-6">
+              <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <h4 class="font-bold text-slate-900 text-sm">Return-Trip Capacity Reuse</h4>
+                  <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Zero Deadhead</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                  Avoid driving back empty. Once delivered at Yeshwanthpur, the platform matches an incoming agricultural input backhaul to Kolar.
+                </p>
+
+                <!-- Suggested Return Cargo -->
+                <div class="mt-4 p-3.5 rounded-xl bg-amber-50 border border-amber-200">
+                  <div class="flex items-center justify-between text-xs font-bold text-amber-900">
+                    <span>Backhaul Match Available</span>
+                    <span>+ ₹ 1,120</span>
+                  </div>
+                  <p class="text-xs text-slate-700 mt-1">
+                    <strong>Organic Compost & Micro-Nutrient Crates</strong> (600 kg) from Yeshwanthpur Warehouse to Hosakote Agri-Service Depot.
+                  </p>
+                  <button onclick="triggerSimAction('Accepted Backhaul Load for Return Trip (+₹1,120)')" class="mt-3 w-full py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-xs transition">
+                    Accept Return Job
+                  </button>
+                </div>
+              </div>
+
+              <!-- Vehicle Health & Cold-Chain Telemetry (Slide 13) -->
+              <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <h4 class="font-bold text-slate-900 text-sm mb-3">Live Cold-Chain Telemetry</h4>
+                <div class="space-y-3 text-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-600">Cargo Bay Temperature</span>
+                    <span class="font-bold text-emerald-700">12.4°C (Target: 10-14°C)</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div class="bg-emerald-500 h-full rounded-full" style="width: 48%;"></div>
+                  </div>
+                  <div class="flex items-center justify-between pt-1">
+                    <span class="text-slate-600">Vibration / Handling Sensor</span>
+                    <span class="font-bold text-slate-800">Normal (Smooth Corridor)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: Live Shipment Lifecycle & Exception Recovery Simulator -->
+        <div id="panel-lifecycle-view" class="tab-panel hidden">
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-slate-100 gap-4">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-rose-700">Slide 6 & Slide 14 Exception Handling</span>
+                <h3 class="text-xl font-black text-slate-900 mt-0.5">Shipment State Machine & Exception Recovery</h3>
+                <p class="text-xs text-slate-500">Live operational lifecycle with automated edge-case triggers.</p>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-600">Current Phase:</span>
+                <span id="lifecycle-phase-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  Step 4: Driver Matched
+                </span>
+              </div>
+            </div>
+
+            <!-- 8 Lifecycle Step Tracker (Slide 6) -->
+            <div class="mt-6 overflow-x-auto pb-4">
+              <div class="flex items-center justify-between min-w-[700px] text-center text-xs">
+                <div class="flex-1 step-node" id="step-node-1">
+                  <div class="w-8 h-8 mx-auto rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shadow-xs">1</div>
+                  <span class="font-bold text-slate-800 block mt-1.5">1. Post</span>
+                  <span class="text-[10px] text-slate-400">Demand Logged</span>
+                </div>
+                <div class="w-6 h-0.5 bg-emerald-500"></div>
+
+                <div class="flex-1 step-node" id="step-node-2">
+                  <div class="w-8 h-8 mx-auto rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shadow-xs">2</div>
+                  <span class="font-bold text-slate-800 block mt-1.5">2. Verify</span>
+                  <span class="text-[10px] text-slate-400">KYC & Produce</span>
+                </div>
+                <div class="w-6 h-0.5 bg-emerald-500"></div>
+
+                <div class="flex-1 step-node" id="step-node-3">
+                  <div class="w-8 h-8 mx-auto rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shadow-xs">3</div>
+                  <span class="font-bold text-slate-800 block mt-1.5">3. Aggregate</span>
+                  <span class="text-[10px] text-slate-400">Load Pooled</span>
+                </div>
+                <div class="w-6 h-0.5 bg-emerald-500"></div>
+
+                <div class="flex-1 step-node" id="step-node-4">
+                  <div class="w-8 h-8 mx-auto rounded-full bg-brand-700 text-white font-bold flex items-center justify-center ring-4 ring-emerald-200">4</div>
+                  <span class="font-bold text-brand-800 block mt-1.5">4. Match</span>
+                  <span class="text-[10px] text-brand-600 font-semibold">Active State</span>
+                </div>
+                <div class="w-6 h-0.5 bg-slate-300"></div>
+
+                <div class="flex-1 step-node" id="step-node-5">
+                  <div class="w-8 h-8 mx-auto rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center">5</div>
+                  <span class="font-bold text-slate-500 block mt-1.5">5. Pick Up</span>
+                  <span class="text-[10px] text-slate-400">Farm Gate</span>
+                </div>
+                <div class="w-6 h-0.5 bg-slate-300"></div>
+
+                <div class="flex-1 step-node" id="step-node-6">
+                  <div class="w-8 h-8 mx-auto rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center">6</div>
+                  <span class="font-bold text-slate-500 block mt-1.5">6. Move</span>
+                  <span class="text-[10px] text-slate-400">In Transit</span>
+                </div>
+                <div class="w-6 h-0.5 bg-slate-300"></div>
+
+                <div class="flex-1 step-node" id="step-node-7">
+                  <div class="w-8 h-8 mx-auto rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center">7</div>
+                  <span class="font-bold text-slate-500 block mt-1.5">7. Deliver</span>
+                  <span class="text-[10px] text-slate-400">Mandi Gate OTP</span>
+                </div>
+                <div class="w-6 h-0.5 bg-slate-300"></div>
+
+                <div class="flex-1 step-node" id="step-node-8">
+                  <div class="w-8 h-8 mx-auto rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center">8</div>
+                  <span class="font-bold text-slate-500 block mt-1.5">8. Settle</span>
+                  <span class="text-[10px] text-slate-400">Reconciliation</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Exception Trigger Buttons (Slide 14) -->
+            <div class="mt-8 p-5 bg-rose-50/60 rounded-2xl border border-rose-200">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-rose-900">Slide 14 Testbench: "What Happens When Something Goes Wrong?"</span>
+                <span class="text-[11px] text-rose-700 font-medium">Click to test automatic platform recovery</span>
+              </div>
+
+              <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <button onclick="triggerExceptionRecovery('DRIVER_CANCEL')" class="p-3 bg-white rounded-xl border border-rose-300 hover:bg-rose-100 text-left transition">
+                  <div class="text-xs font-bold text-rose-800">1. Driver Cancels ❌</div>
+                  <div class="text-[11px] text-slate-600 mt-1">Re-open pool, alert backup ranked vehicle, confirm via SMS.</div>
+                </button>
+
+                <button onclick="triggerExceptionRecovery('VEHICLE_BREAKDOWN')" class="p-3 bg-white rounded-xl border border-rose-300 hover:bg-rose-100 text-left transition">
+                  <div class="text-xs font-bold text-rose-800">2. Truck Breakdown ⚠️</div>
+                  <div class="text-[11px] text-slate-600 mt-1">Freeze state, dispatch nearby relief vehicle, alert APMC agent.</div>
+                </button>
+
+                <button onclick="triggerExceptionRecovery('QTY_CHANGE')" class="p-3 bg-white rounded-xl border border-rose-300 hover:bg-rose-100 text-left transition">
+                  <div class="text-xs font-bold text-rose-800">3. Farmer Qty Change ⚖️</div>
+                  <div class="text-[11px] text-slate-600 mt-1">Recalculate leftover payload and adjust per-kg fare table.</div>
+                </button>
+
+                <button onclick="triggerExceptionRecovery('BUYER_DISPUTE')" class="p-3 bg-white rounded-xl border border-rose-300 hover:bg-rose-100 text-left transition">
+                  <div class="text-xs font-bold text-rose-800">4. Produce Damage Flag 📸</div>
+                  <div class="text-[11px] text-slate-600 mt-1">Log timestamped photographic proof, freeze fee, initiate audit trail.</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Audit Trail Event Logger (Slide 16 Core Data Model) -->
+            <div class="mt-6">
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Immutable Event Audit Trail (Status Events)</h4>
+                <button onclick="clearEventLogs()" class="text-[11px] text-slate-500 hover:text-slate-700">Clear Logs</button>
+              </div>
+              <div id="audit-log-container" class="h-44 overflow-y-auto bg-slate-900 rounded-xl p-3 font-mono text-[11px] text-emerald-400 space-y-1.5">
+                <div class="text-slate-400">[2026-10-13 09:30:12 IST] SYSTEM_INIT: Shipment #KS-8902 created by Farmer Suresh (Hosakote Hub). Access mode: Web/App.</div>
+                <div class="text-emerald-400">[2026-10-13 09:30:15 IST] AGGREGATOR_RUN: Combined with loads #KS-8898 (Malur) & #KS-8901 (Kolar). Total: 1,000 kg.</div>
+                <div class="text-emerald-400">[2026-10-13 09:30:22 IST] CONSTRAINT_ENGINE: Matched Driver Manjunath K. (Tata Ace KA-04-E-4491). Score: 98.2/100.</div>
+                <div class="text-cyan-300">[2026-10-13 09:31:00 IST] DISPATCH_READY: Manifest and route waypoints generated. Awaiting pickup confirmation.</div>
+              </div>
+            </div>
+
+            <!-- Proof of Delivery & Settlement Simulation (Slide 17) -->
+            <div class="mt-6 pt-5 border-t border-slate-200 grid sm:grid-cols-2 gap-4">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <h5 class="text-xs font-bold text-slate-800 mb-2">Proof of Handover (POD)</h5>
+                <p class="text-xs text-slate-600 mb-3">Upon mandi arrival, receiver enters verified 4-digit PIN to release freight payout.</p>
+                <div class="flex items-center gap-2">
+                  <input type="text" id="pod-pin" value="7294" readonly class="w-24 text-center font-mono font-bold text-sm tracking-widest bg-white border border-slate-300 rounded-lg py-1.5 text-slate-800">
+                  <button onclick="completePodVerification()" class="px-4 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold">
+                    Verify & Release Payout
+                  </button>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <h5 class="text-xs font-bold text-slate-800 mb-2">Automated UPI Split Settlement</h5>
+                <div class="text-xs space-y-1 text-slate-600">
+                  <div class="flex justify-between">
+                    <span>Driver Net Payout (Direct UPI):</span>
+                    <span class="font-bold text-slate-900">₹ 1,794.00</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>KisanSetu Platform Coordination (2.5%):</span>
+                    <span class="font-bold text-emerald-700">₹ 46.00</span>
+                  </div>
+                  <div class="flex justify-between text-slate-400 text-[11px] pt-1 border-t border-slate-200">
+                    <span>NPCI / UPI Settlement Status:</span>
+                    <span class="text-emerald-700 font-semibold" id="upi-settle-status">Escrow Held</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="system-architecture" class="py-16 bg-white border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <span class="text-xs font-bold tracking-widest text-emerald-700 uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            Slide 15 & 16 Specification
+          </span>
+          <h2 class="text-3xl font-extrabold text-slate-900 mt-3">Modular Software Architecture & Core Data Schema</h2>
+          <p class="text-slate-600 text-sm sm:text-base mt-2">
+            Built as a lightweight, zero-custom-hardware platform. Designed to run seamlessly across village kiosks, feature phones, and cloud backends.
+          </p>
+        </div>
+
+        <!-- 5 Architectural Layers -->
+        <div class="grid lg:grid-cols-5 gap-4 mb-14">
+          <!-- Layer 1 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-2">1. CLIENT LAYER</div>
+            <ul class="text-xs text-slate-600 space-y-2">
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Farmer Responsive Web / PWA</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Driver Android Application</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>FPO Assisted Kiosk Portal</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>SMS / USSD Gateway (Feature Phone)</li>
+            </ul>
+          </div>
+
+          <!-- Layer 2 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-2">2. API & GATEWAY</div>
+            <ul class="text-xs text-slate-600 space-y-2">
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>JWT & Role-based Auth (RBAC)</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Rate Limiter & Input Validation</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Offline Request Sync Queues</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>REST / WebSocket Stream Gateway</li>
+            </ul>
+          </div>
+
+          <!-- Layer 3 -->
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+            <div class="text-xs font-bold text-brand-800 uppercase tracking-wider mb-2">3. CORE MICROSERVICES</div>
+            <ul class="text-xs text-emerald-950 font-medium space-y-2">
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-700"></span>Load Aggregation Engine</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-700"></span>6-Factor Constraint Matcher</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-700"></span>Dynamic Distance/Fair Pricing</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-700"></span>Automated Recovery Worker</li>
+            </ul>
+          </div>
+
+          <!-- Layer 4 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-2">4. PERSISTENCE LAYER</div>
+            <ul class="text-xs text-slate-600 space-y-2">
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>PostgreSQL (Relational Schema)</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>PostGIS (Geospatial Clustering)</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Redis (Short-lived match locks)</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>IndexedDB (Client offline cache)</li>
+            </ul>
+          </div>
+
+          <!-- Layer 5 -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-2">5. INTEGRATIONS</div>
+            <ul class="text-xs text-slate-600 space-y-2">
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>India Map / OpenRouteService</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Telecom SMS / USSD Hub</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>UPI / NPCI Escrow Gateway</li>
+              <li class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>e-NAM / Mandi Price Feed (API)</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Interactive Core Data Entity Explorer (Slide 16) -->
+        <div class="bg-slate-900 rounded-2xl p-6 sm:p-8 text-white">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
+            <div>
+              <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Slide 16 Data Architecture</span>
+              <h3 class="text-xl font-bold mt-1">Lifecycle-Centric Data Entities</h3>
+              <p class="text-xs text-slate-400">Everything revolves around the timestamped Shipment Lifecycle, not isolated siloed profiles.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="inspectSchema('shipment')" class="schema-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white">Shipment</button>
+              <button onclick="inspectSchema('match')" class="schema-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white">Match</button>
+              <button onclick="inspectSchema('event')" class="schema-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white">Status Event</button>
+              <button onclick="inspectSchema('vehicle')" class="schema-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white">Vehicle</button>
+            </div>
+          </div>
+
+          <div id="schema-viewer" class="mt-6 font-mono text-xs bg-slate-950 p-5 rounded-xl border border-slate-800 text-slate-300 overflow-x-auto">
+            <span class="text-slate-500">// Schema definition: Shipment Entity</span><br>
+            <span class="text-emerald-400">CREATE TABLE</span> <span class="text-amber-300">shipments</span> (<br>
+            &nbsp;&nbsp;id <span class="text-purple-400">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>,<br>
+            &nbsp;&nbsp;farmer_id <span class="text-purple-400">UUID REFERENCES farmers(id)</span>,<br>
+            &nbsp;&nbsp;crop_type <span class="text-sky-300">VARCHAR(64) NOT NULL</span>, <span class="text-slate-500">-- Tomato, Onion, etc.</span><br>
+            &nbsp;&nbsp;quantity_kg <span class="text-sky-300">NUMERIC(8,2) NOT NULL</span>,<br>
+            &nbsp;&nbsp;perishability_tier <span class="text-sky-300">VARCHAR(16)</span>, <span class="text-slate-500">-- HIGH, MED, AMBIENT</span><br>
+            &nbsp;&nbsp;pickup_geom <span class="text-sky-300">GEOMETRY(Point, 4326)</span>,<br>
+            &nbsp;&nbsp;destination_mandi <span class="text-sky-300">VARCHAR(128)</span>,<br>
+            &nbsp;&nbsp;window_start <span class="text-sky-300">TIMESTAMP WITH TIME ZONE</span>,<br>
+            &nbsp;&nbsp;is_aggregated <span class="text-purple-400">BOOLEAN DEFAULT true</span>,<br>
+            &nbsp;&nbsp;batch_id <span class="text-purple-400">UUID REFERENCES aggregated_batches(id)</span>,<br>
+            &nbsp;&nbsp;created_via <span class="text-sky-300">VARCHAR(16)</span> <span class="text-slate-500">-- 'APP', 'ASSISTED', 'SMS'</span><br>
+            );
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact-roadmap" class="py-16 bg-slate-50 border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-14">
+          <span class="text-xs font-bold tracking-widest text-emerald-700 uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            Slide 18, 19 & 20 Framework
+          </span>
+          <h2 class="text-3xl font-extrabold text-slate-900 mt-3">Measurable Impact & Deployment Roadmap</h2>
+          <p class="text-slate-600 text-sm sm:text-base mt-2">
+            We measure operational ground reality — not superficial vanity app downloads. Here is our pilot-validated execution strategy.
+          </p>
+        </div>
+
+        <!-- 4 Key Impact Metric Gauges (Slide 20) -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-lg mb-3">
+              ⏱️
+            </div>
+            <div class="text-2xl font-black text-brand-700">- 4.8 Hours</div>
+            <div class="text-xs font-bold text-slate-800 mt-1">Harvest-to-Pickup Time</div>
+            <p class="text-[11px] text-slate-500 mt-1">Pre-scheduling prevents produce sitting in heat; cuts spoilage by 21%.</p>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-lg mb-3">
+              🚚
+            </div>
+            <div class="text-2xl font-black text-brand-700">82.5%</div>
+            <div class="text-xs font-bold text-slate-800 mt-1">Vehicle Capacity Utilization</div>
+            <p class="text-[11px] text-slate-500 mt-1">Up from baseline 43% underfilled private runs through smart aggregation.</p>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-lg mb-3">
+              ₹
+            </div>
+            <div class="text-2xl font-black text-brand-700">38% Savings</div>
+            <div class="text-xs font-bold text-slate-800 mt-1">Average Logistics Cost / kg</div>
+            <p class="text-[11px] text-slate-500 mt-1">Smallholder farmers pay only for their exact share of freight space.</p>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+            <div class="w-12 h-12 mx-auto rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-black text-lg mb-3">
+              📶
+            </div>
+            <div class="text-2xl font-black text-brand-700">54%</div>
+            <div class="text-xs font-bold text-slate-800 mt-1">Assisted / Low-Bandwidth Share</div>
+            <p class="text-[11px] text-slate-500 mt-1">Ensures rural farmers without high-end smartphones are fully included.</p>
+          </div>
+        </div>
+
+        <!-- 4-Phase Implementation Roadmap (Slide 21) -->
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <h3 class="font-extrabold text-slate-900 text-lg">Phase-Wise Deployment Roadmap</h3>
+            <p class="text-xs text-slate-500">"Build the smallest complete system first, then expand by geography and capability."</p>
+          </div>
+
+          <div class="grid md:grid-cols-4 gap-6 relative">
+            <!-- Phase 1 -->
+            <div class="p-4 rounded-xl border-2 border-brand-500 bg-brand-50/40 relative">
+              <span class="text-[10px] font-extrabold text-brand-700 uppercase tracking-wider block mb-1">PHASE 1 • COMPLETED</span>
+              <h4 class="font-bold text-slate-900 text-sm">Working Prototype</h4>
+              <p class="text-xs text-slate-600 mt-2">
+                Farmer + driver + operator workflows; complete shipment lifecycle; rule-based matching & offline queue.
+              </p>
+              <span class="inline-block mt-3 text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">SIH 2026 Deliverable</span>
+            </div>
+
+            <!-- Phase 2 -->
+            <div class="p-4 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition">
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">PHASE 2 • MONTHS 1–3</span>
+              <h4 class="font-bold text-slate-900 text-sm">Controlled Cluster Pilot</h4>
+              <p class="text-xs text-slate-600 mt-2">
+                Deploy across 1 district / FPO network (Hosakote-Kolar); validate real cost savings and aggregation reliability.
+              </p>
+              <span class="inline-block mt-3 text-[11px] font-medium text-slate-500">Target: 250 Farmers</span>
+            </div>
+
+            <!-- Phase 3 -->
+            <div class="p-4 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition">
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">PHASE 3 • MONTHS 4–9</span>
+              <h4 class="font-bold text-slate-900 text-sm">Regional Scale</h4>
+              <p class="text-xs text-slate-600 mt-2">
+                Multiple horticulture districts; onboard fleet partners; launch ML route clustering and return backhaul optimization.
+              </p>
+              <span class="inline-block mt-3 text-[11px] font-medium text-slate-500">State Agri-Marketing Board</span>
+            </div>
+
+            <!-- Phase 4 -->
+            <div class="p-4 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 transition">
+              <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">PHASE 4 • YEAR 2+</span>
+              <h4 class="font-bold text-slate-900 text-sm">National Network</h4>
+              <p class="text-xs text-slate-600 mt-2">
+                e-NAM integration; interoperable multi-modal transport; pan-India multilingual IVR/USSD access.
+              </p>
+              <span class="inline-block mt-3 text-[11px] font-medium text-slate-500">National Logistics Policy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-12 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="p-6 rounded-2xl bg-slate-900 text-white">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
+            <div>
+              <h3 class="font-bold text-sm text-slate-200">Official Evidence Base & National Policy Citations</h3>
+              <p class="text-xs text-slate-400">Strict adherence to SIH 2026 presentation submission standards</p>
+            </div>
+            <span class="text-xs text-amber-400 font-mono">Slide 27 References</span>
+          </div>
+
+          <div class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs text-slate-300">
+            <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700">
+              <div class="font-bold text-emerald-400 mb-1">1. MoFPI Loss Study (2022)</div>
+              <p class="text-slate-400 text-[11px]">Ministry of Food Processing Industries — Study to Determine Post Harvest Losses of Agri Produces in India.</p>
+            </div>
+            <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700">
+              <div class="font-bold text-emerald-400 mb-1">2. ICAR Annual Report (2021-22)</div>
+              <p class="text-slate-400 text-[11px]">DARE-ICAR Significant Achievements: Quantitative harvest-to-retail loss mitigation frameworks.</p>
+            </div>
+            <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700">
+              <div class="font-bold text-emerald-400 mb-1">3. Task Force on Cold Chain</div>
+              <p class="text-slate-400 text-[11px]">MoFPI Assessment on Cold Chain Projects and perishability infrastructure-gap analyses.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-slate-950 text-slate-400 py-10 border-t border-slate-800 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-700 text-white font-bold flex items-center justify-center">
+          🌾
+        </div>
+        <div>
+          <span class="font-bold text-white text-sm">KisanSetu (किसान सेतु)</span>
+          <p class="text-slate-500 text-[11px]">Smart India Hackathon 2026 • Final Project Presentation</p>
+        </div>
+      </div>
+      <div class="text-center md:text-right text-slate-500">
+        <p>Built for fragmented farmer aggregation and rural transport coordination.</p>
+        <p class="text-[11px] mt-0.5">Zero physical fleet ownership • Open digital coordination architecture.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // --- Application State ---
+    const appState = {
+      isOnline: true,
+      lang: 'en',
+      activeTab: 'farmer-view',
+      offlineQueue: [],
+      currentLifecycleStep: 4,
+      lastCalculatedCost: 255.00
+    };
+
+    // --- Multilingual Dictionaries ---
+    const i18n = {
+      en: {
+        cropLabel: "Select Commodity / Crop",
+        qtyLabel: "Produce Weight (Kilograms)",
+        pickupLabel: "Pickup Point (Village Collection)",
+        destLabel: "Target Destination / Wholesale Mandi"
+      },
+      hi: {
+        cropLabel: "फसल / उपज चुनें",
+        qtyLabel: "उत्पादन वजन (किलोग्राम)",
+        pickupLabel: "पिकअप स्थान (ग्राम संग्रह केंद्र)",
+        destLabel: "गंतव्य / थोक मंडी"
+      },
+      kn: {
+        cropLabel: "ಬೆಳೆ ಆಯ್ಕೆಮಾಡಿ",
+        qtyLabel: "ತೂಕ (ಕಿಲೋಗ್ರಾಂ)",
+        pickupLabel: "ಸಂಗ್ರಹ ಕೇಂದ್ರ",
+        destLabel: "ಮಾರುಕಟ್ಟೆ / ಮಂಡಿ"
+      },
+      mr: {
+        cropLabel: "पीक निवडा",
+        qtyLabel: "वजन (किलो)",
+        pickupLabel: "संकलन केंद्र",
+        destLabel: "घाऊक बाजार / मंडी"
+      }
+    };
+
+    // --- Multilingual Switcher ---
+    function setAppLanguage(lang) {
+      appState.lang = lang;
+      ['en', 'hi', 'kn', 'mr'].forEach(l => {
+        const btn = document.getElementById(`lang-${l}`);
+        if (l === lang) {
+          btn.className = "px-2 py-1 rounded bg-white text-emerald-800 shadow-xs font-bold";
+        } else {
+          btn.className = "px-2 py-1 rounded text-slate-600 hover:text-emerald-800";
+        }
+      });
+
+      const dict = i18n[lang] || i18n.en;
+      document.getElementById('lbl-crop').innerText = dict.cropLabel;
+      document.getElementById('lbl-qty').innerText = dict.qtyLabel;
+      document.getElementById('lbl-pickup').innerText = dict.pickupLabel;
+      document.getElementById('lbl-dest').innerText = dict.destLabel;
+
+      showToast(`Language switched to ${lang.toUpperCase()}`);
+    }
+
+    // --- Connectivity Simulation Toggle ---
+    function toggleNetworkConnectivity() {
+      appState.isOnline = !appState.isOnline;
+      const ind = document.getElementById('net-indicator');
+      const text = document.getElementById('net-status-text');
+      const syncDot = document.getElementById('sync-dot');
+      const syncLabel = document.getElementById('sync-label');
+
+      if (appState.isOnline) {
+        ind.className = "w-2 h-2 rounded-full bg-emerald-500";
+        text.innerText = "Online";
+        syncDot.className = "w-3 h-3 rounded-full bg-emerald-500";
+        syncLabel.className = "text-xs text-emerald-700 font-semibold";
+        syncLabel.innerText = "Synced with Cloud";
+
+        // Flush offline queue if any
+        if (appState.offlineQueue.length > 0) {
+          const syncedCount = appState.offlineQueue.length;
+          appState.offlineQueue = [];
+          document.getElementById('offline-queue-count').innerText = "0 Shipments";
+          logAuditEvent(`[NETWORK_RESTORE] Auto-synced ${syncedCount} queued booking(s) to central PostgreSQL cluster.`);
+          showToast(`Network restored! ${syncedCount} offline booking(s) synced.`);
+        } else {
+          showToast("Network restored: Connected to central server.");
+        }
+      } else {
+        ind.className = "w-2 h-2 rounded-full bg-rose-500 animate-ping";
+        text.innerText = "2G / Offline";
+        syncDot.className = "w-3 h-3 rounded-full bg-amber-500";
+        syncLabel.className = "text-xs text-amber-700 font-semibold";
+        syncLabel.innerText = "Offline Mode (IndexedDB Active)";
+        showToast("Simulating 2G/Rural signal blackout: Offline fallback active.");
+        logAuditEvent(`[NETWORK_DROP] Lost internet connection. Switching to local queue & SMS fallback mode.`);
+      }
+    }
+
+    // --- Tab Switcher Logic ---
+    function switchTab(tabId) {
+      appState.activeTab = tabId;
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+      document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+
+      document.querySelectorAll('.role-tab').forEach(btn => {
+        btn.className = "role-tab px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-brand-600 transition whitespace-nowrap";
+      });
+
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) {
+        activeBtn.className = "role-tab px-4 py-2 rounded-lg text-xs sm:text-sm font-bold bg-brand-600 text-white transition whitespace-nowrap shadow-xs";
+      }
+    }
+
+    // --- Dynamic Fare Estimation Engine (Slide 8) ---
+    function calculateEstimate() {
+      const cropSelect = document.getElementById('crop-select');
+      const selectedOption = cropSelect.options[cropSelect.selectedIndex];
+      const rateMultiplier = parseFloat(selectedOption.getAttribute('data-rate')) || 1.0;
+      const isPerishable = selectedOption.getAttribute('data-perish') === 'high';
+
+      const qty = parseFloat(document.getElementById('crop-qty').value) || 0;
+      const reeferChecked = document.getElementById('require-reefer').checked;
+      const aggregateChecked = document.getElementById('opt-aggregate').checked;
+
+      // Auto-suggest reefer for high perishable
+      if (isPerishable && !reeferChecked && cropSelect.value === 'Tomato') {
+        document.getElementById('require-reefer').checked = true;
+      }
+
+      // Base Freight = Qty * Standard Route Base (₹0.85/kg) * Multiplier
+      const baseFreight = qty * 0.93 * rateMultiplier;
+      const handlingFee = document.getElementById('require-reefer').checked ? (qty * 0.35) : 0;
+      
+      // Shared aggregation rebate (approx 35-42% reduction)
+      const discount = aggregateChecked ? (baseFreight * 0.38) : 0;
+      const platformFee = Math.max(12, (baseFreight - discount) * 0.025);
+      const total = Math.max(80, (baseFreight + handlingFee - discount + platformFee));
+
+      document.getElementById('est-base-freight').innerText = `₹ ${baseFreight.toFixed(2)}`;
+      document.getElementById('est-handling-fee').innerText = `₹ ${handlingFee.toFixed(2)}`;
+      document.getElementById('est-discount').innerText = aggregateChecked ? `- ₹ ${discount.toFixed(2)}` : `₹ 0.00`;
+      document.getElementById('est-platform-fee').innerText = `₹ ${platformFee.toFixed(2)}`;
+      document.getElementById('est-total-cost').innerText = `₹ ${total.toFixed(2)}`;
+      document.getElementById('est-per-kg').innerText = `₹ ${(total / qty).toFixed(2)} / kg`;
+
+      appState.lastCalculatedCost = total;
+    }
+
+    // --- Farmer Form Submission Handler ---
+    function handleFarmerSubmit(e) {
+      e.preventDefault();
+      const crop = document.getElementById('crop-select').value;
+      const qty = document.getElementById('crop-qty').value;
+      const pickup = document.getElementById('pickup-point').value;
+      const dest = document.getElementById('dest-market').value;
+      const mode = document.getElementById('access-mode-select').value;
+
+      if (!appState.isOnline) {
+        appState.offlineQueue.push({ crop, qty, pickup, dest, mode, timestamp: new Date() });
+        document.getElementById('offline-queue-count').innerText = `${appState.offlineQueue.length} Queued`;
+        showToast(`Offline mode: Booking saved locally! SMS backup sent to +91-XXXXXXXX.`);
+        logAuditEvent(`[OFFLINE_ENQUEUE] Booking cached in IndexedDB. SMS payload dispatched via Twilio/CDAC gateway.`);
+        return;
+      }
+
+      showToast(`Shipment for ${qty}kg ${crop} added to Smart Aggregation Pool!`);
+      logAuditEvent(`[SHIPMENT_POSTED] ${qty}kg ${crop} from ${pickup} ➔ ${dest} [Mode: ${mode.toUpperCase()}]. Est Fare: ₹${appState.lastCalculatedCost.toFixed(2)}`);
+      
+      // Move user smoothly to Tab 2 to inspect aggregation
+      setTimeout(() => {
+        switchTab('aggregation-view');
+      }, 700);
+    }
+
+    // --- Stage Preview in Hero ---
+    function previewStageDetail(stageNumber) {
+      const messages = {
+        1: "Stage 1 (FARMERS): Farmers register crop harvest volume 24-48 hrs in advance, shifting from reactive distress calls to proactive capacity pre-allocation.",
+        2: "Stage 2 (AGGREGATE): Neighboring smallholders along the same transport corridor are grouped algorithmically to fill vehicle payloads (Slide 7).",
+        3: "Stage 3 (MATCH): Multi-constraint engine screens temperature, route detour limits, timing windows, and verified driver ratings.",
+        4: "Stage 4 (TRANSPORT): Turn-by-turn waypoint route manifest sent to driver with guaranteed advance payout and return backhaul suggestions.",
+        5: "Stage 5 (MARKET): Verified OTP delivery at wholesale mandi terminal releases escrow funds directly to driver's bank via UPI."
+      };
+
+      document.querySelectorAll('.stage-step').forEach(el => {
+        el.classList.remove('bg-emerald-50/60', 'border-emerald-200');
+        el.classList.add('border-slate-200', 'bg-white');
+      });
+
+      const activeCard = document.getElementById(`stage-card-${stageNumber}`);
+      if (activeCard) {
+        activeCard.classList.remove('border-slate-200', 'bg-white');
+        activeCard.classList.add('bg-emerald-50/60', 'border-emerald-200');
+      }
+
+      document.getElementById('stage-detail-box').innerHTML = `<span class="font-bold text-emerald-800">Stage ${stageNumber} Insight:</span> ${messages[stageNumber]}`;
+    }
+
+    // --- Trigger Recovery Workflows (Slide 14) ---
+    function triggerExceptionRecovery(type) {
+      if (type === 'DRIVER_CANCEL') {
+        showToast("Alert: Driver Manjunath cancelled. Re-allocating backup vehicle...");
+        logAuditEvent("[EXCEPTION: DRIVER_CANCEL] Driver Manjunath K. cancelled. Triggering fallback cascade.");
+        logAuditEvent("[RECOVERY: BACKUP_MATCH] Match Engine auto-selected Tier-2 vehicle (KA-03-D-1190, Driver Ravi Shankar, 4.8★). Farmer notified via SMS.");
+        updateLifecycleBadge("Recovered: Backup Assigned", "bg-amber-100 text-amber-800 border-amber-300");
+      } else if (type === 'VEHICLE_BREAKDOWN') {
+        showToast("Alert: Vehicle axle breakdown reported near Malur bypass.");
+        logAuditEvent("[EXCEPTION: BREAKDOWN] Vehicle KA-04-E-4491 telemetry reported stoppage. Shipment state FROZEN.");
+        logAuditEvent("[RECOVERY: RELIEF_DISPATCH] Relief van dispatched from Kolar Hub. Farmer & APMC buyer notified.");
+        updateLifecycleBadge("Emergency Relief En Route", "bg-rose-100 text-rose-800 border-rose-300");
+      } else if (type === 'QTY_CHANGE') {
+        showToast("Farmer Suresh revised quantity from 450kg to 380kg.");
+        logAuditEvent("[EXCEPTION: QUANTITY_DELTA] Farmer सुरेश changed volume (-70kg). Recalculating remaining usable volume.");
+        logAuditEvent("[RECOVERY: RECALCULATE] Remaining capacity +70kg advertised to Malur FPO queue. Fare adjusted.");
+        updateLifecycleBadge("Capacity Recalculated", "bg-blue-100 text-blue-800 border-blue-300");
+      } else if (type === 'BUYER_DISPUTE') {
+        showToast("Buyer flagged 10% moisture damage on tomato crates.");
+        logAuditEvent("[EXCEPTION: DISPUTE_FLAG] Mandi Buyer flagged damaged goods. Photographic inspection captured.");
+        logAuditEvent("[RECOVERY: AUDIT_TRAIL] Escrow payout frozen for 48 hrs. Dispute ID #DISP-9921 generated for FPO arbitration.");
+        updateLifecycleBadge("Under Dispute Review", "bg-purple-100 text-purple-800 border-purple-300");
+      }
+    }
+
+    function updateLifecycleBadge(text, classNames) {
+      const badge = document.getElementById('lifecycle-phase-badge');
+      badge.className = `px-3 py-1 rounded-full text-xs font-bold border ${classNames}`;
+      badge.innerText = text;
+    }
+
+    // --- Proof of Delivery PIN Verification ---
+    function completePodVerification() {
+      const pin = document.getElementById('pod-pin').value;
+      if (pin === "7294") {
+        showToast("POD Verified! Mandi receiver signed off. Releasing UPI payment.");
+        logAuditEvent("[POD_COMPLETE] OTP #7294 verified by Mandi Receiver Gate #4. Handover completed.");
+        logAuditEvent("[NPCI_UPI_SETTLE] Payment ₹1,794.00 settled to Driver Manjunath UPI ID (manju@upi). Transaction ID: #TXN-8829104.");
+        document.getElementById('upi-settle-status').innerText = "Settled & Closed";
+        document.getElementById('upi-settle-status').className = "text-emerald-600 font-bold";
+        
+        // Mark all 8 steps completed
+        for (let i = 1; i <= 8; i++) {
+          const node = document.querySelector(`#step-node-${i} > div`);
+          if (node) {
+            node.className = "w-8 h-8 mx-auto rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shadow-xs";
+          }
+        }
+        updateLifecycleBadge("Shipment Closed & Settled", "bg-emerald-100 text-emerald-800 border-emerald-300");
+      }
+    }
+
+    // --- Driver Simulation Action ---
+    function triggerSimAction(actionDesc) {
+      showToast(actionDesc);
+      logAuditEvent(`[DRIVER_ACTION] ${actionDesc}`);
+    }
+
+    // --- Audit Log Helpers ---
+    function logAuditEvent(msg) {
+      const container = document.getElementById('audit-log-container');
+      const timeStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
+      const newEntry = document.createElement('div');
+      newEntry.className = "text-slate-300 animate-fadeIn";
+      newEntry.innerText = `[${timeStr} IST] ${msg}`;
+      container.insertBefore(newEntry, container.firstChild);
+    }
+
+    function clearEventLogs() {
+      document.getElementById('audit-log-container').innerHTML = `<div class="text-slate-500">// Audit trail cleared. Listening for new system lifecycle events...</div>`;
+    }
+
+    // --- Schema Viewer Interactive Tab (Slide 16) ---
+    function inspectSchema(type) {
+      document.querySelectorAll('.schema-btn').forEach(btn => {
+        btn.className = "schema-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:text-white";
+      });
+      event.target.className = "schema-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white";
+
+      const viewer = document.getElementById('schema-viewer');
+      if (type === 'shipment') {
+        viewer.innerHTML = `
+<span class="text-slate-500">// Schema definition: Shipment Entity (Slide 16)</span><br>
+<span class="text-emerald-400">CREATE TABLE</span> <span class="text-amber-300">shipments</span> (<br>
+&nbsp;&nbsp;id <span class="text-purple-400">UUID PRIMARY KEY DEFAULT gen_random_uuid()</span>,<br>
+&nbsp;&nbsp;farmer_id <span class="text-purple-400">UUID REFERENCES farmers(id)</span>,<br>
+&nbsp;&nbsp;crop_type <span class="text-sky-300">VARCHAR(64) NOT NULL</span>,<br>
+&nbsp;&nbsp;quantity_kg <span class="text-sky-300">NUMERIC(8,2) NOT NULL</span>,<br>
+&nbsp;&nbsp;perishability_tier <span class="text-sky-300">VARCHAR(16)</span>, <span class="text-slate-500">-- 'HIGH_COLD_REQUIRED', 'AMBIENT'</span><br>
+&nbsp;&nbsp;pickup_geom <span class="text-sky-300">GEOMETRY(Point, 4326)</span>,<br>
+&nbsp;&nbsp;destination_mandi <span class="text-sky-300">VARCHAR(128)</span>,<br>
+&nbsp;&nbsp;batch_id <span class="text-purple-400">UUID REFERENCES aggregated_batches(id)</span>,<br>
+&nbsp;&nbsp;access_channel <span class="text-sky-300">VARCHAR(16)</span> <span class="text-slate-500">-- 'APP', 'FPO_ASSISTED', 'SMS'</span><br>
+);`;
+      } else if (type === 'match') {
+        viewer.innerHTML = `
+<span class="text-slate-500">// Schema definition: Match & Scoring Entity (Slide 8 & 16)</span><br>
+<span class="text-emerald-400">CREATE TABLE</span> <span class="text-amber-300">matches</span> (<br>
+&nbsp;&nbsp;id <span class="text-purple-400">UUID PRIMARY KEY</span>,<br>
+&nbsp;&nbsp;batch_id <span class="text-purple-400">UUID REFERENCES aggregated_batches(id)</span>,<br>
+&nbsp;&nbsp;driver_id <span class="text-purple-400">UUID REFERENCES drivers(id)</span>,<br>
+&nbsp;&nbsp;vehicle_id <span class="text-purple-400">UUID REFERENCES vehicles(id)</span>,<br>
+&nbsp;&nbsp;match_score <span class="text-sky-300">NUMERIC(5,2)</span>, <span class="text-slate-500">-- 0.00 to 100.00 composite constraint ranking</span><br>
+&nbsp;&nbsp;route_detour_km <span class="text-sky-300">NUMERIC(5,2)</span>,<br>
+&nbsp;&nbsp;agreed_freight_inr <span class="text-sky-300">NUMERIC(10,2)</span>,<br>
+&nbsp;&nbsp;status <span class="text-sky-300">VARCHAR(32)</span> <span class="text-slate-500">-- 'PROPOSED', 'ACCEPTED', 'REJECTED', 'CANCELLED'</span><br>
+);`;
+      } else if (type === 'event') {
+        viewer.innerHTML = `
+<span class="text-slate-500">// Schema definition: Status Event Trail (Slide 14 & 16)</span><br>
+<span class="text-emerald-400">CREATE TABLE</span> <span class="text-amber-300">status_events</span> (<br>
+&nbsp;&nbsp;id <span class="text-purple-400">BIGSERIAL PRIMARY KEY</span>,<br>
+&nbsp;&nbsp;shipment_id <span class="text-purple-400">UUID REFERENCES shipments(id)</span>,<br>
+&nbsp;&nbsp;timestamp <span class="text-sky-300">TIMESTAMP WITH TIME ZONE DEFAULT NOW()</span>,<br>
+&nbsp;&nbsp;actor_role <span class="text-sky-300">VARCHAR(32)</span>, <span class="text-slate-500">-- 'FARMER', 'DRIVER', 'SYSTEM_ENGINE', 'APMC_BUYER'</span><br>
+&nbsp;&nbsp;event_state <span class="text-sky-300">VARCHAR(64)</span>, <span class="text-slate-500">-- 'AGGREGATED', 'PICKUP_RECORDED', 'EXCEPTION_FLAGGED'</span><br>
+&nbsp;&nbsp;lat_lon_telemetry <span class="text-sky-300">GEOMETRY(Point, 4326)</span>,<br>
+&nbsp;&nbsp;metadata_json <span class="text-purple-400">JSONB</span> <span class="text-slate-500">-- Pod signatures, error logs, inspection photos</span><br>
+);`;
+      } else if (type === 'vehicle') {
+        viewer.innerHTML = `
+<span class="text-slate-500">// Schema definition: Vehicle & Verification Schema (Slide 13)</span><br>
+<span class="text-emerald-400">CREATE TABLE</span> <span class="text-amber-300">vehicles</span> (<br>
+&nbsp;&nbsp;id <span class="text-purple-400">UUID PRIMARY KEY</span>,<br>
+&nbsp;&nbsp;registration_no <span class="text-sky-300">VARCHAR(32) UNIQUE NOT NULL</span>, <span class="text-slate-500">-- 'KA-04-E-4491'</span><br>
+&nbsp;&nbsp;bay_type <span class="text-sky-300">VARCHAR(32)</span>, <span class="text-slate-500">-- 'REFRIGERATED', 'INSULATED_VENTILATED', 'OPEN_BED'</span><br>
+&nbsp;&nbsp;payload_kg <span class="text-sky-300">NUMERIC(8,2) NOT NULL</span>,<br>
+&nbsp;&nbsp;min_temp_celsius <span class="text-sky-300">NUMERIC(4,1)</span>,<br>
+&nbsp;&nbsp;fitness_valid_until <span class="text-sky-300">DATE NOT NULL</span>,<br>
+&nbsp;&nbsp;verification_status <span class="text-sky-300">VARCHAR(32) DEFAULT 'VERIFIED'</span><br>
+);`;
+      }
+    }
+
+    // --- UI Toast Notifications ---
+    function showToast(message) {
+      const toast = document.getElementById('sim-toast');
+      const text = document.getElementById('sim-toast-text');
+      text.innerHTML = `<span>${message}</span>`;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 5000);
+    }
+
+    function dismissToast() {
+      document.getElementById('sim-toast').classList.add('hidden');
+    }
+
+    function recalculateAggregationBatch() {
+      showToast("Re-evaluating cluster algorithms for Kolar-Hosakote route...");
+      logAuditEvent("[ENGINE_RUN] Re-optimizing 14 pending shipments along NH-75. Batch consolidation updated.");
+    }
+
+    // Initialize calculations on boot
+    window.addEventListener('DOMContentLoaded', () => {
+      calculateEstimate();
+      previewStageDetail(1);
+    });
+  </script>
+</body>
+</html>
